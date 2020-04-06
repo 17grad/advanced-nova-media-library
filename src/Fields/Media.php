@@ -181,6 +181,8 @@ class Media extends Field
                     );
                 }
 
+                $collection = $this->getFullCollectionName($collection, $model);
+
                 $media = $media->toMediaCollection($collection);
 
                 // fill custom properties for recently created media
@@ -219,6 +221,8 @@ class Media extends Field
         if ($collectionName === 'ComputedField') {
             $collectionName = call_user_func($this->computedCallback, $resource);
         }
+
+        $collectionName = $this->getFullCollectionName($collectionName, $resource);
 
 		$this->value = $resource->getMedia($collectionName)
             ->map(function (\Spatie\MediaLibrary\Models\Media $media) {
@@ -286,5 +290,13 @@ class Media extends Field
     public function conversionOnView(string $conversionOnDetailView): self
     {
         return $this->withMeta(compact('conversionOnDetailView'));
+    }
+
+    private function getFullCollectionName(string $collectionName, $model): string {
+        if (get_class($model) == 'Whitecube\NovaFlexibleContent\Layouts\Layout') {
+            return $collectionName . '-' . $model->key();
+        }
+
+        return $collectionName;
     }
 }
