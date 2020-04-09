@@ -141,7 +141,12 @@ class Media extends Field
 
     protected function handleMedia(NovaRequest $request, $model, $attribute, $data)
     {
-        $remainingIds = $this->removeDeletedMedia($data, $model->getMedia($attribute));
+        $remainingIds = $this->removeDeletedMedia(
+            $data, $model->getMedia(
+                $this->getFullCollectionName($attribute, $model)
+            )
+        );
+
         $newIds = $this->addNewMedia($request, $data, $model, $attribute);
         $existingIds = $this->addExistingMedia($request, $data, $model, $attribute, $model->getMedia($attribute));
         $this->setOrder($remainingIds->union($newIds)->union($existingIds)->sortKeys()->all());
